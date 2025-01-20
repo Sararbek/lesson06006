@@ -1,0 +1,14 @@
+.category-scroll::-webkit-scrollbar{
+    height: 0;
+}
+
+.to-left{
+    background: linear-gradient(90deg, #efefef, #ddd, #efefef);
+    background-size: 200%;
+    animation: toLeft 1s linear infinite;
+}
+@keyframes toLeft {
+    to{
+        background-position: 200%;
+    }
+}
