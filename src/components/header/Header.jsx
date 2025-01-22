@@ -8,14 +8,12 @@ import { LiaShoppingBagSolid } from "react-icons/lia";
 import { SlLocationPin } from "react-icons/sl";
 import { HiMiniRectangleStack } from "react-icons/hi2";
 import { IoSearchOutline } from "react-icons/io5";
-import axios from 'axios';
 
 import { Toaster, toast } from 'sonner'
 import CategoryLoading from '../categoryLoading/CategoryLoading';
+import { request } from '../../api';
 
-const BASE_URL = "https://dummyjson.com"
-
-const Header = () => {
+const Header = ({setEndPoint, setCount, endPoint}) => {
 
     const [error, setError] = useState()
     const [loading, setLoading] = useState(false)
@@ -25,8 +23,8 @@ const Header = () => {
         const fetchCategories = async () => {
             try {
                 setLoading(true)
-                 const response = await axios.get(`${BASE_URL}/products/category-list`)
-                 setCategoryLists(response.data)
+                 const response = await request.get(`/products/category-list`)
+                 setCategoryLists(['all', ...response.data])
             } catch (error) {
                 setError(error.message)
             }finally{
@@ -116,7 +114,10 @@ const Header = () => {
             <ul className='flex items-center gap-4 overflow-x-auto category-scroll'>
                 {
                     categoryLists?.map((category, inx) => (
-                        <li key={inx} className='whitespace-nowrap px-3 py-1 rounded text-textSecondFontColor bg-bgSearchIconColor hover:opacity-80 cursor-pointer'>{category}</li>
+                        <li key={inx} onClick={() => {
+                            setEndPoint(category)
+                            setCount(0)
+                        }} className={`whitespace-nowrap capitalize px-3 h-8 flex items-center justify-center rounded text-textSecondFontColor ${endPoint === category ? 'bg-slate-300' : 'bg-bgSearchIconColor'} hover:opacity-80 cursor-pointer duration-200`}>{category}</li>
                     ))
                 }
             </ul>

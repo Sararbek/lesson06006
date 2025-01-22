@@ -8,7 +8,7 @@ const CategoryLoading = () => {
     <div className={`grid grid-cols-10 gap-4`}>
         {
             Array(loadingLimit).fill().map((_, inx) => (
-                <div key={inx} className='h-9 rounded bg-[#efefef] to-left'></div>
+                <div key={inx} className='h-8 rounded bg-[#efefef] to-left'></div>
             ))
         }
     </div>

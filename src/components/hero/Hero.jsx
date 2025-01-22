@@ -1,26 +1,37 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 
-const BASE_URL = "https://dummyjson.com"
-
 import { IoIosStar } from "react-icons/io";
 import { TbShoppingBagPlus } from "react-icons/tb";
 import { GrFavorite } from "react-icons/gr";
 import Loading from '../loading/Loading';
+import { request } from '../../api';
 
-const Hero = () => {
+const Hero = ({endPoint, count, setCount, setOneItem}) => {
     
     const [loading, setLoading] = useState(false)
     const [products, setProducts] = useState([])
+    const [total, setTotal] = useState(0)
 
     const limit = 10
 
     useEffect(() => {
         const fetchProducts = async () => {
+            if(count === 0) setProducts([])
             try{
                 setLoading(true)
-                const response = await axios.get(`${BASE_URL}/products?limit=${limit}`)
-                setProducts(response.data.products)
+                const response = await request.get(endPoint === 'all' ? `/products` : `/products/category/${endPoint}`, {
+                    params: {
+                        limit,
+                        skip: count * limit
+                    }
+                })
+                if(count === 0){
+                    setProducts(response.data.products)
+                    setTotal(response.data.total)
+                }else{
+                    setProducts([...products, ...response.data.products])
+                }
             }catch(err){
                 console.log(err.status)
             }finally{
@@ -29,21 +40,18 @@ const Hero = () => {
         }
 
         fetchProducts()
-    }, [])
+    }, [count, endPoint])
 
   return (
     <div className='w-full min-h-[100vh] py-12 font-Inter'>
         <div className="container">
-            {
-                loading && <Loading/>
-            }
-                 <div className='grid grid-cols-5 gap-x-5 gap-y-8'>
+            <div className={`grid grid-cols-5 gap-x-5 gap-y-8 ${count > 0 && 'pb-8'}`}>
                 {
                     products?.map((product) => (
                         <div key={product.id} className='cursor-pointer rounded-lg overflow-hidden hover:shadow-normal duration-300 ease-in'>
                             <div className='w-full h-[310px] relative bg-[#efefef] flex items-center justify-center rounded-b-lg hover:rounded-b-none duration-300 ease-linear'>
-                                <img src={product.thumbnail} alt={product.title} className='
-                                object-contain' />
+                                <img src={product.thumbnail} onClick={() => setOneItem(product)} alt={product.title} className='
+                                object-contain hover:scale-110 duration-300 ease-in' />
                                 <button className=' absolute z-5 text-xl top-4 right-4 '>
                                     <GrFavorite className='text-textLogoColor'/>
                                 </button>
@@ -74,7 +82,16 @@ const Hero = () => {
                         </div>
                     ))
                 }
-                </div>
+            </div>
+            {
+                loading && <Loading/>
+            }
+            {
+                total > limit * (count + 1)  && 
+            <div onClick={() => setCount(count + 1)} className='flex items-center justify-center mt-8 py-2 px-14 max-w-[740px] h-14 w-full mx-auto rounded bg-bgProductColor hover:bg-slate-200 cursor-pointer'>
+                <button className='text-base text-textFirstFontColor font-semibold'>Yana ko'rsatish 10</button>
+            </div>
+            }
         </div>
     </div>
   )
